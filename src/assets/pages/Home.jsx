@@ -243,7 +243,8 @@ function Home() {
                       key={index}
                       className={hovered === index || activeTop === index ? 'hovered' : ''}
                       onMouseEnter={() => setHovered(index)}
-                      onMouseLeave={() => setHovered(-1)}
+                      // no onMouseLeave reset: the cube stays expanded on the last
+                      // selected item; tapping another item just switches the selection
                       onClick={() => handleTopClick(index)}
                     >
                       {top}
