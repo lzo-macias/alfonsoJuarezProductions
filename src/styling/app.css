@@ -425,6 +425,7 @@
       padding: 24px 16px;
       position: relative;   /* sits above the cube canvas */
       z-index: 5;
+      color: #214c79;
       pointer-events: auto; /* re-enable: .rightSide turned events off */
     }
     .topfive li {
@@ -435,7 +436,13 @@
       font-weight: 300;
       font-size: 13px;
       cursor: pointer;
+      color: #6b6b6b;                    /* legible resting state */
+
+
       transition: color 0.2s ease;
+      /* without this, a quick second tap is swallowed by the browser's
+         double-tap-to-zoom gesture, so the 2nd tap never navigates */
+      touch-action: manipulation;
     }
     .topfive li:last-child {
       flex-basis: 100%;     /* 5th drops to its own row, centered by justify-content */
@@ -444,8 +451,9 @@
       content: ',';         /* comma separators */
     }
     .topfive li.hovered {
-      color: #1A1A1A;       /* same teal hover as the desktop list */
+      color: #1A1A1A;       /* tapped/selected -> dark */
     }
+
     .projects { display: none; }
     .leftSide { display: none; }
 

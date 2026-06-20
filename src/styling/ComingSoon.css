@@ -1,0 +1,36 @@
+.comingSoon {
+  position: fixed;
+  inset: 0;
+  z-index: 100;                /* above everything in the hero */
+  background: #F5F6F6;         /* same background as the site */
+  font-family: 'Jost', sans-serif;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.comingSoon h1 {
+  margin: 0;
+  font-weight: 300;
+  font-style: italic;
+  font-size: clamp(28px, 8vw, 64px);
+  color: #1A1A1A;
+}
+
+.comingSoonBack {
+  all: unset;
+  position: fixed;
+  top: 20px;
+  left: 20px;
+  font-family: 'Jost', sans-serif;
+  font-weight: 300;
+  font-style: italic;
+  font-size: 14px;
+  color: #6b6b6b;
+  cursor: pointer;
+  transition: color 0.2s ease;
+}
+
+.comingSoonBack:hover {
+  color: #1A1A1A;
+}

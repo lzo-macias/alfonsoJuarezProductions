@@ -2,6 +2,7 @@ import React, { useRef, useState, useEffect } from 'react'
 import "../../styling/app.css"
 import Cube from '../components/Cube'
 import Sliders from '../components/Sliders'
+import ComingSoon from '../components/ComingSoon'
 import { div } from 'three/tsl'
 
 // fashion / runway stock photos (Unsplash — CORS-enabled so WebGL can texture them).
@@ -124,14 +125,34 @@ function Home() {
   const rightRef = useRef(null)
   // shared scroll signal the cube reads every frame (velocity = how fast you're scrolling)
   const scroll = useRef({ velocity: 0, lastTop: 0 })
-  // which project is hovered -> drives the teal text + the cube's panel selection
-  const [hovered, setHovered] = useState(-1)
+  // which project is hovered -> drives the teal text + the cube's panel selection.
+  // on mobile we boot with index 2 (Mangox Eckhaus Latta Collaboration) selected so
+  // the cube loads fully expanded, matching the pre-selected top-five item. desktop
+  // boots idle (-1) so its load is unchanged.
+  const [hovered, setHovered] = useState(() =>
+    typeof window !== 'undefined' && window.matchMedia('(max-width: 768px)').matches ? 2 : -1
+  )
   // filters the user has picked from the dropdown -> shown as chips by the buttons
   const [filters, setFilters] = useState([])
   const addFilter = (f) => setFilters((prev) => (prev.includes(f) ? prev : [...prev, f]))
   const removeFilter = (f) => setFilters((prev) => prev.filter((x) => x !== f))
   // toggles the interactive cube into the preview slot (instead of the image preview)
   const [showCube, setShowCube] = useState(false)
+  // top-five (mobile) two-tap: first tap selects/expands an item, second tap on the
+  // SAME item navigates to the coming-soon page. activeTop = which one is "armed".
+  // start with the 3rd top-five item (index 2 — left of the middle row on mobile)
+  // pre-selected: it loads in dark (#1A1A1A) and takes a single tap to navigate.
+  const [activeTop, setActiveTop] = useState(2)
+  const [comingSoon, setComingSoon] = useState(false)
+
+  const handleTopClick = (index) => {
+    if (activeTop === index) {
+      setComingSoon(true)          // second tap -> go to the page
+    } else {
+      setActiveTop(index)          // first tap -> arm + expand
+      setHovered(index)            // the cube reacts to the selection
+    }
+  }
   // scrolling ANYWHERE on the page scrolls the project list. listen on window
   // (native, non-passive) so preventDefault() stops the page from scrolling and
   // we redirect the wheel delta into the list instead.
@@ -220,9 +241,10 @@ function Home() {
                     {topfive.map((top, index) => (
                     <li
                       key={index}
-                      className={hovered === index ? 'hovered' : ''}
+                      className={hovered === index || activeTop === index ? 'hovered' : ''}
                       onMouseEnter={() => setHovered(index)}
                       onMouseLeave={() => setHovered(-1)}
+                      onClick={() => handleTopClick(index)}
                     >
                       {top}
                     </li>
@@ -255,6 +277,11 @@ function Home() {
                 </div>
             </div>
         </div>
+        {comingSoon && (
+          <ComingSoon
+            onBack={() => { setComingSoon(false); setActiveTop(-1) }}
+          />
+        )}
     </div>
   )
 }
