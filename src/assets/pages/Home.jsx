@@ -1,5 +1,5 @@
 import React, { useRef, useState, useEffect } from 'react'
-import "../app.css"
+import "../../styling/app.css"
 import Cube from '../components/Cube'
 import Sliders from '../components/Sliders'
 import { div } from 'three/tsl'
@@ -26,6 +26,7 @@ const fashionImages = [
   '1475180098004-ca77a66827be',
   '1524504388940-b1c1722653e1',
 ].map((id) => `https://images.unsplash.com/photo-${id}?w=500&h=500&fit=crop&auto=format&q=70`)
+
 
 const projects = [
   'Basketcase x New Balance Pelle Cass',
@@ -137,6 +138,11 @@ function Home() {
   useEffect(() => {
     const onWheel = (e) => {
       if (!leftRef.current) return
+      // only hijack the wheel when the desktop list is actually on screen.
+      // on mobile .leftSide is display:none (offsetParent === null), so let the
+      // page scroll natively — otherwise preventDefault traps the page and you
+      // can never scroll down to the archive below the hero.
+      if (leftRef.current.offsetParent === null) return
       e.preventDefault()
       leftRef.current.scrollTop += e.deltaY
     }
