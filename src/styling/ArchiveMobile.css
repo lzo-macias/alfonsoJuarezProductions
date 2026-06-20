@@ -12,6 +12,7 @@
     font-family: 'Jost', sans-serif;
     padding: 24px 8vw 64px;
     box-sizing: border-box;
+    padding-top: 20px;
   }
 
   .archiveMobile .archiveHeader {
