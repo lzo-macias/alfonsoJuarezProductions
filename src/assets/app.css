@@ -1,0 +1,499 @@
+#root {
+  background-color: #F5F6F6;
+}
+
+.home {
+  height: 100vh;        /* exactly one screen */
+  width: 100%;
+  overflow: hidden;     /* the PAGE never scrolls; the list scrolls instead */
+  font-family: 'Jost', sans-serif;
+}
+
+.mainContainer {
+  position: relative;
+  height: 100vh;
+  width: 100%;
+}
+
+.leftSide {
+  height: 100vh;
+  width: 100%;
+  overflow-y: auto;             /* the list scrolls inside here, not the page */
+  scrollbar-width: none;        /* Firefox */
+  -ms-overflow-style: none;
+}
+
+.leftSide::-webkit-scrollbar {     /* Chrome, Safari, new Edge */
+  display: none;
+}
+
+/* overlay layer: sits over the full-screen scrolling list, click-through except
+   for the real controls (buttons), which re-enable pointer events below. */
+.rightSide {
+  position: fixed;
+  inset: 0;
+  z-index: 5;
+  pointer-events: none;
+}
+
+.rightSide button {
+  pointer-events: auto;
+}
+
+/* the three.js canvas fills .rightSide, OUT of flow so the buttons/titleCards
+   sit on top of it instead of being pushed off-screen below it */
+.cube-canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 6;   /* above .topfive (z-index 5) */
+}
+
+/* hover graphics — two overlapping images where the cube used to be.
+   fixed (not absolute) so it spans the whole viewport instead of being
+   trapped inside the collapsed, absolutely-positioned .rightSide. */
+.sliders {
+  position: fixed;
+  inset: 0;
+  z-index: 6;
+  pointer-events: none;   /* don't block hover/scroll on the list */
+}
+
+.sliders .slide {
+  position: absolute;        /* top/left come from inline styles (randomized in JS) */
+  width: 32%;
+  max-width: 360px;
+  aspect-ratio: 4 / 5;
+  object-fit: cover;
+  opacity: 0;
+  animation: fadeIn 0.45s ease forwards;   /* just appear — fade, no sliding */
+}
+
+/* tiny stagger so they don't pop at the exact same instant */
+.sliders .slide:nth-of-type(2) {
+  animation-delay: 0.12s;
+}
+
+@keyframes fadeIn {
+  to { opacity: 1; }
+}
+
+/* A.svg brand mark, fixed in the corner above the canvas */
+.logo {
+  position: fixed;
+  top: 20px;
+  left: 20px;
+  width: 48px;
+  height: auto;
+  z-index: 10;
+}
+
+.projects {
+  list-style: none;
+  padding: 64px 0 64px 8vw;
+  /* NOT absolute: must stay in .leftSide's flow so the list can scroll */
+}
+
+/* wrapper stays in flow so rows stack; no longer a full-width hit strip */
+.projectListContainer {
+  position: relative;
+}
+
+.projects li {
+  font-weight: 300;
+  font-size: 14px;
+  line-height: 1;
+  margin-top: 11px;
+  white-space: nowrap;
+  width: fit-content;                /* hover target = the text itself */
+  cursor: pointer;
+  color: #6b6b6b;                    /* legible resting state */
+  transition: color 0.2s ease;
+}
+
+.projects li.hovered {
+  color: #1A1A1A;
+}
+
+/* base (mobile-safe); desktop layout lives in the (width > 768px) block */
+.buttons {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  pointer-events: auto;
+}
+
+.twomain {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;       /* chips sit in line with the filter/archive buttons */
+  gap: 16px;
+  pointer-events: auto;
+}
+
+.info {
+  margin-left: 40px;
+}
+
+.buttons button,
+.info button {
+  all: unset;
+  font-family: 'Jost', sans-serif;
+  font-weight: 300;
+  font-style: italic;
+  font-size: 14px;
+  color: #1A1A1A;
+  cursor: pointer;
+}
+
+/* filter dropdown — the wrapper is the hover zone so moving from the button
+   down onto the options keeps it open (options sit flush under the button). */
+.filterWrap {
+  position: relative;
+  /* padding-bottom: 5px; */
+}
+
+.optionfilters {
+  position: absolute;
+  top: 100%;            /* box top touches the button bottom... */
+  left: 50%;
+  transform: translateX(-50%);
+  display: none;        /* hidden until the wrapper is hovered */
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding-top: 10px;    /* ...this padding bridges the gap so hover never drops */
+  margin: 0;
+  list-style: none;
+}
+
+.filterWrap:hover .optionfilters {
+  display: flex;        /* reveal on hover */
+  flex-direction: row;
+}
+
+.optionfilters li {
+  font-family: 'Jost', sans-serif;
+  font-weight: 300;
+  font-size: 13px;
+  color: #6b6b6b;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: color 0.2s ease;
+}
+
+.optionfilters li:hover {
+  color: #1A1A1A;
+}
+
+/* selected filter chips — sit between filter and archive; wrap to new rows
+   (beneath) once they hit the max width. */
+.selectedFilters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  max-width: 320px;        /* past this, chips wrap downward */
+  align-content: flex-start;
+}
+
+.filterChip {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  background: #fff;
+  border: 1px solid #000;
+  padding: 1px 6px;
+  font-family: 'Jost', sans-serif;
+  font-size: 11px;
+  line-height: 1.4;
+  color: #1A1A1A;
+  white-space: nowrap;
+}
+
+/* small x in the top-RIGHT corner, revealed on hover, click to remove */
+.chipX {
+  all: unset;
+  position: absolute;
+  top: -6px;
+  right: -6px;
+  width: 12px;
+  height: 12px;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  background: #1A1A1A;
+  color: #fff;
+  border-radius: 50%;
+  font-size: 9px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.filterChip:hover .chipX {
+  display: inline-flex;
+}
+
+.logo {
+  min-width: 1000px;
+  position: relative;
+  top: -600px;
+  z-index: 2;
+  left: 300px;
+}
+
+
+/* title: bottom-right, mixed weight, responsive */
+.titleCards {
+  position: absolute;
+  bottom: 28px;
+  right: 40px;
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+}
+
+.titleCards h1,
+.titleCards h2 {
+  margin: 0;
+  font-family: 'Jost', sans-serif;
+  font-size: 30px;        /* mobile-safe base; desktop overrides with clamp */
+  line-height: 1;
+}
+
+.titleCards h1 {
+  color: #777777;
+  font-weight: bold;
+}
+
+.titleCards h2 {
+  color: #111;
+}
+
+/* hover preview: anchored right-center, disciplined 2-up grid */
+.previewContainer {
+  position: absolute;
+  top: 50%;
+  right: 5vw;
+  transform: translateY(-50%);
+  width: min(48vw, 760px);
+  height: min(62vh, 560px);
+  background-color: #1A1A1A;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+  padding: 14px;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: 6;
+  animation: previewIn 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;  /* slide in on mount */
+}
+
+.previewImg {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+@keyframes previewIn {
+  from { opacity: 0; transform: translate(40px, -50%) scale(0.99); }
+  to   { opacity: 1; transform: translate(0, -50%) scale(1); }
+}
+
+/* "the cube" toggle next to the title */
+.cubeToggle {
+  all: unset;
+  font-family: 'Jost', sans-serif;
+  font-style: italic;
+  font-weight: 300;
+  font-size: 12px;
+  color: #6b6b6b;
+  cursor: pointer;
+  font-style: italic;
+  /* border: 1px solid #1A1A1A; */
+  padding: 2px 8px;
+  transition: color 0.2s ease, background 0.2s ease;
+  display:none;
+}
+
+/* .cubeToggle:hover {
+  color: #fff;
+  background: #1A1A1A;
+} */
+
+  @media (width > 768px) {
+    .topfive { display: none; }
+    .mobilebuttons { display: none;}
+    .cube-canvas {display: none}
+
+    /* cube mode: drop the interactive cube exactly where the preview lives.
+       higher specificity than `.cube-canvas { display:none }` above, so it wins. */
+    .cubeMode .cube-canvas {
+      display: block;
+      position: absolute;
+      inset: auto;
+      top: 50%;
+      right: 5vw;
+      transform: translateY(-50%);
+      width: min(68vw, 1100px);
+      height: min(92vh, 900px);
+      z-index: 6;
+    }
+
+    /* top nav: filter/archive centered, Info pinned right */
+    .buttons {
+      position: absolute;
+      top: 28px;
+      left: 0;
+      right: 0;
+      padding: 0 40px;
+    }
+    .info {
+      position: absolute;
+      right: 40px;
+      margin-left: 0;
+      pointer-events: auto;
+    }
+
+    /* title: bottom-right, mixed weight, responsive */
+    .titleCards h1,
+    .titleCards h2 {
+      font-size: clamp(22px, 3vw, 42px);
+    }
+    .titleCards h1 { font-weight: 400; }
+    .titleCards h2 { color: #1A1A1A; font-weight: 700; }
+  }
+  
+  @media (width <= 768px) {
+    /* lock the app to exactly one screen so nothing scrolls past it */
+    .sliders,
+    .previewContainer {
+      display: none;
+    }
+    .home {
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    .rightSide {
+      width: 100vw;       /* cube fills the phone width; stays in flow */
+      min-height: 100vh;
+      height: 100vh;
+      position: relative;
+    }
+    .cubeToggle {
+      display: none;
+    }
+    /* pin the title centered at the bottom of the screen, OUT of flow so it
+       adds no scroll height. reset the desktop width/margin/size. */
+    .titleCards {
+      position: fixed;
+      bottom: 16px;
+      left: 0;
+      right: 0;
+      width: auto;        /* undo desktop width: 800px */
+      margin: 0;          /* undo desktop margin-left: 12vw */
+      flex-direction: row;
+      flex-wrap: wrap;    /* let the two lines wrap on a narrow phone */
+      justify-content: center;
+      align-items: center;
+      gap: 6px;
+      z-index: 5;
+    }
+    .titleCards h1,
+    .titleCards h2 {
+      font-size: 28px;    /* bigger on mobile */
+    }
+    /* nudge the cube left + down on mobile only */
+    .cube-canvas {
+      transform: translate(-8vw, 20vh);
+    }
+    /* TOP 5: two per row, comma-separated, 5th centered beneath — no pixel nudging */
+    .topfive {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      align-items: center;
+      gap: 6px 6px;
+      list-style: none;
+      margin: 0;
+      padding: 24px 16px;
+      position: relative;   /* sits above the cube canvas */
+      z-index: 5;
+      pointer-events: auto; /* re-enable: .rightSide turned events off */
+    }
+    .topfive li {
+      flex: 0 0 45%;        /* ~two per row, % not px so it scales */
+      text-align: center;
+      list-style: none;
+      font-family: 'Jost', sans-serif;
+      font-weight: 300;
+      font-size: 13px;
+      cursor: pointer;
+      transition: color 0.2s ease;
+    }
+    .topfive li:last-child {
+      flex-basis: 100%;     /* 5th drops to its own row, centered by justify-content */
+    }
+    .topfive li:not(:last-child)::after {
+      content: ',';         /* comma separators */
+    }
+    .topfive li.hovered {
+      color: #1A1A1A;       /* same teal hover as the desktop list */
+    }
+    .projects { display: none; }
+    .leftSide { display: none; }
+
+    /* keep .buttons visible (it WRAPS the mobile buttons) but hide the
+       desktop sub-groups, and show the stacked mobile buttons instead */
+    .buttons {
+      display: flex;
+      justify-content: center;
+      width: 100%;
+      left: 0;
+      align-items: center;
+    }
+    .twomain { display: none; }
+    .info { display: none; }
+    .mobilebuttons .info {
+      color: #777777;
+      opacity: 70%;
+      
+    }
+    .mobilebuttons .archive {
+      color: #777777;
+      opacity: 70%;
+      
+    }
+
+    .mobilebuttons .info:hover {
+      color: #1A1A1A;   /* teal */
+    }
+
+
+    .mobilebuttons .archive:hover {
+      color: #1A1A1A;   /* teal */
+    }
+
+    .mobilebuttons {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      gap: 8px;
+      position: relative;
+      z-index: 5;
+    }
+    /* button-reset goes on the BUTTONS, not the flex container */
+    .mobilebuttons button {
+      all: unset;
+      font-family: 'Jost', sans-serif;
+      font-weight: 300;
+      font-style: italic;
+      cursor: pointer;
+      padding-top: 15px;
+    }
+  }
+  
