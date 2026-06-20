@@ -7,7 +7,7 @@
   width: 100%;
   overflow: hidden;     /* the PAGE never scrolls; the list scrolls instead */
   font-family: 'Jost', sans-serif;
-  /* margin-bottom: 20px; */
+  margin-bottom: 100px;
 }
 
 .mainContainer {
