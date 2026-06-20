@@ -7,7 +7,7 @@
   width: 100%;
   overflow: hidden;     /* the PAGE never scrolls; the list scrolls instead */
   font-family: 'Jost', sans-serif;
-  margin-bottom: 100px;
+  /* margin-bottom: 100px; */
 }
 
 .mainContainer {
@@ -408,9 +408,10 @@
     .titleCards h2 {
       font-size: 28px;    /* bigger on mobile */
     }
-    /* nudge the cube left + down on mobile only */
+    /* nudge the cube left on mobile only (second value moves it up/down —
+       lower = higher up the screen) */
     .cube-canvas {
-      transform: translate(-8vw, 20vh);
+      transform: translate(-8vw, 5vh);
     }
     /* TOP 5: two per row, comma-separated, 5th centered beneath — no pixel nudging */
     .topfive {
