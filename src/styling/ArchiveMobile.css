@@ -30,17 +30,111 @@
   }
 
   .filter-lines {
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
+    all: unset;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
     cursor: pointer;
+    font-family: 'Jost', sans-serif;
+    font-weight: 400;
+    font-size: 16px;
+    color: #1A1A1A;
   }
 
-  .filter-lines span {
+  /* the three stacked lines; position:relative so the count badge can pin to its
+     top-right corner */
+  .filter-icon {
+    position: relative;
+    display: inline-flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .filter-icon > span:not(.filter-badge) {
     display: block;
     width: 22px;
     height: 1.5px;
     background: #1A1A1A;
+  }
+
+  /* small circle at the corner of the three lines showing how many are selected */
+  .filter-badge {
+    position: absolute;
+    top: -7px;
+    right: -10px;
+    min-width: 15px;
+    height: 15px;
+    padding: 0 3px;
+    box-sizing: border-box;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: #1A1A1A;
+    color: #F5F6F6;
+    border-radius: 50%;
+    font-size: 9px;
+    font-weight: 400;
+    line-height: 1;
+  }
+
+  /* full-screen filter page — same background, pops over the archive */
+  .filterPage {
+    position: fixed;
+    inset: 0;
+    z-index: 40;                 /* above .archiveMobile (20) */
+    background: #F5F6F6;
+    font-family: 'Jost', sans-serif;
+    padding: 64px 8vw 64px;
+    box-sizing: border-box;
+  }
+
+  .filterBack {
+    all: unset;
+    position: fixed;
+    top: 20px;
+    left: 20px;
+    font-weight: 300;
+    font-style: italic;
+    font-size: 14px;
+    color: #6b6b6b;
+    cursor: pointer;
+    transition: color 0.2s ease;
+  }
+
+  .filterBack:active,
+  .filterBack:hover {
+    color: #1A1A1A;
+  }
+
+  .filterList {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;     /* filters stacked vertically */
+  }
+
+  .filterOption {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 0;
+    border-bottom: 1px solid #e3e4e4;
+    font-weight: 300;
+    font-size: 18px;
+    color: #6b6b6b;
+    cursor: pointer;
+    transition: color 0.2s ease;
+    touch-action: manipulation;
+  }
+
+  .filterOption.on {
+    color: #1A1A1A;             /* selected filter darkens */
+  }
+
+  .filterCheck {
+    font-size: 16px;
+    color: #1A1A1A;
   }
 
   .archiverow {

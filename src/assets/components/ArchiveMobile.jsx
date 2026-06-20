@@ -1,5 +1,8 @@
-import React from 'react'
+import React, { useState } from 'react'
 import '../../styling/ArchiveMobile.css'
+
+// the seven selectable filters
+const FILTERS = [1, 2, 3, 4, 5, 6, 7]
 
 const projects = [
   'Basketcase x New Balance Pelle Cass',
@@ -68,18 +71,31 @@ const projects = [
 ]
 
 function ArchiveMobile() {
+  // whether the filter page is open, and which filters are selected (saved here so
+  // they persist while this component is mounted, even after closing the page)
+  const [filterOpen, setFilterOpen] = useState(false)
+  const [selected, setSelected] = useState([])
+
+  const toggleFilter = (n) =>
+    setSelected((prev) => (prev.includes(n) ? prev.filter((x) => x !== n) : [...prev, n]))
+
   return (
     <div className='archiveMobile'>
         <div className='archiveHeader'>
             <h2>
                 Archive
             </h2>
-            <h2 className='filter-lines'>
+            <button className='filter-lines' onClick={() => setFilterOpen(true)}>
                 Filters
-                <span></span>
-                <span></span>
-                <span></span>
-            </h2>
+                <span className='filter-icon'>
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                    {selected.length > 0 && (
+                      <span className='filter-badge'>{selected.length}</span>
+                    )}
+                </span>
+            </button>
         </div>
         {projects.map((project, index) => (
             <div
@@ -90,6 +106,29 @@ function ArchiveMobile() {
                 <span>2025</span>
             </div>
         ))}
+
+        {filterOpen && (
+          <div className='filterPage'>
+            <button className='filterBack' onClick={() => setFilterOpen(false)}>
+              ← back
+            </button>
+            <ul className='filterList'>
+              {FILTERS.map((n) => {
+                const isOn = selected.includes(n)
+                return (
+                  <li
+                    key={n}
+                    className={isOn ? 'filterOption on' : 'filterOption'}
+                    onClick={() => toggleFilter(n)}
+                  >
+                    <span className='filterNum'>{n}</span>
+                    {isOn && <span className='filterCheck'>✓</span>}
+                  </li>
+                )
+              })}
+            </ul>
+          </div>
+        )}
     </div>
   )
 }

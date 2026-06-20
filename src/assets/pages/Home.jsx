@@ -125,12 +125,13 @@ function Home() {
   const rightRef = useRef(null)
   // shared scroll signal the cube reads every frame (velocity = how fast you're scrolling)
   const scroll = useRef({ velocity: 0, lastTop: 0 })
+  // pick a random top-five item to pre-select — fresh on every page load
+  const [preselected] = useState(() => Math.floor(Math.random() * topfive.length))
   // which project is hovered -> drives the teal text + the cube's panel selection.
-  // on mobile we boot with index 2 (Mangox Eckhaus Latta Collaboration) selected so
-  // the cube loads fully expanded, matching the pre-selected top-five item. desktop
-  // boots idle (-1) so its load is unchanged.
+  // on mobile we boot with the random pre-selected item so the cube loads fully
+  // expanded; desktop boots idle (-1) so its load is unchanged.
   const [hovered, setHovered] = useState(() =>
-    typeof window !== 'undefined' && window.matchMedia('(max-width: 768px)').matches ? 2 : -1
+    typeof window !== 'undefined' && window.matchMedia('(max-width: 768px)').matches ? preselected : -1
   )
   // filters the user has picked from the dropdown -> shown as chips by the buttons
   const [filters, setFilters] = useState([])
@@ -140,9 +141,9 @@ function Home() {
   const [showCube, setShowCube] = useState(false)
   // top-five (mobile) two-tap: first tap selects/expands an item, second tap on the
   // SAME item navigates to the coming-soon page. activeTop = which one is "armed".
-  // start with the 3rd top-five item (index 2 — left of the middle row on mobile)
-  // pre-selected: it loads in dark (#1A1A1A) and takes a single tap to navigate.
-  const [activeTop, setActiveTop] = useState(2)
+  // it boots on the random pre-selected item: it loads dark (#1A1A1A) and takes a
+  // single tap to navigate.
+  const [activeTop, setActiveTop] = useState(preselected)
   const [comingSoon, setComingSoon] = useState(false)
 
   const handleTopClick = (index) => {
