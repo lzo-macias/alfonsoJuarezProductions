@@ -139,6 +139,12 @@ function Home() {
   const removeFilter = (f) => setFilters((prev) => prev.filter((x) => x !== f))
   // toggles the interactive cube into the preview slot (instead of the image preview)
   const [showCube, setShowCube] = useState(false)
+  // hides the sticky image preview after you scroll past the very top/bottom of
+  // the list. it's a separate gate (not just hovered) because the browser fires
+  // mouseenter events while the list scrolls under a stationary cursor, which
+  // would immediately restore `hovered` and undo a plain reset. this flag stays
+  // set until you make a REAL mouse move, matching the fresh page-load state.
+  const [previewHidden, setPreviewHidden] = useState(false)
   // top-five (mobile) two-tap: first tap selects/expands an item, second tap on the
   // SAME item navigates to the coming-soon page. activeTop = which one is "armed".
   // it boots on the random pre-selected item: it loads dark (#1A1A1A) and takes a
@@ -170,6 +176,24 @@ function Home() {
     }
     window.addEventListener('wheel', onWheel, { passive: false })
     return () => window.removeEventListener('wheel', onWheel)
+  }, [])
+
+  // hide the sticky image preview when the cursor moves OFF THE ENDS of the list
+  // — above the very first project or below the very last one. this is purely a
+  // pointer-position check (scrolling is irrelevant): we compare the mouse Y
+  // against the current top of the first item and bottom of the last item.
+  useEffect(() => {
+    const onMove = (e) => {
+      const list = leftRef.current
+      if (!list) return
+      const items = list.querySelectorAll('.projectListContainer')
+      if (!items.length) return
+      const firstTop = items[0].getBoundingClientRect().top
+      const lastBottom = items[items.length - 1].getBoundingClientRect().bottom
+      setPreviewHidden(e.clientY < firstTop || e.clientY > lastBottom)
+    }
+    window.addEventListener('mousemove', onMove)
+    return () => window.removeEventListener('mousemove', onMove)
   }, [])
 
   // measure how far the list moved this tick -> feed the cube's pulse
@@ -257,7 +281,7 @@ function Home() {
                     .sliders (the cube stays and reacts to `hovered`). */}
                 <Cube images={fashionImages} scroll={scroll} hovered={hovered} />
                 {/* charcoal preview slides in on hover — hidden while the cube is shown */}
-                {!showCube && hovered >= 0 && (
+                {!showCube && hovered >= 0 && !previewHidden && (
                   <div className='previewContainer' key={hovered}>
                     {imagesFor(hovered).map((src, i) => (
                       <img key={i} src={src} alt='' className='previewImg' />
