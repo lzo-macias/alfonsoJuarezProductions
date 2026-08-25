@@ -1,4 +1,3 @@
-import React from 'react'
 
 
 function Filter() {
@@ -7,7 +6,7 @@ function Filter() {
         <div>
 
         </div>
-        
+
     </div>
   )
 }

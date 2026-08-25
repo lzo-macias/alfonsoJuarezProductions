@@ -1,14 +1,14 @@
 .archiveMobile {
-  display: none;            /* desktop has its own archive flow */
+  display: none;
 }
 
 @media (width <= 768px) {
   .archiveMobile {
     display: block;
     position: relative;
-    z-index: 20;            /* above the hero's fixed titleCards (z-index 5) */
+    z-index: 20;
     min-height: 100vh;
-    background: #F5F6F6;    /* solid so the hero doesn't bleed through */
+    background: #F5F6F6;
     font-family: 'Jost', sans-serif;
     padding: 24px 8vw 64px;
     box-sizing: border-box;
@@ -41,8 +41,6 @@
     color: #1A1A1A;
   }
 
-  /* the three stacked lines; position:relative so the count badge can pin to its
-     top-right corner */
   .filter-icon {
     position: relative;
     display: inline-flex;
@@ -57,7 +55,6 @@
     background: #1A1A1A;
   }
 
-  /* small circle at the corner of the three lines showing how many are selected */
   .filter-badge {
     position: absolute;
     top: -7px;
@@ -77,11 +74,10 @@
     line-height: 1;
   }
 
-  /* full-screen filter page — same background, pops over the archive */
   .filterPage {
     position: fixed;
     inset: 0;
-    z-index: 40;                 /* above .archiveMobile (20) */
+    z-index: 40;
     background: #F5F6F6;
     font-family: 'Jost', sans-serif;
     padding: 64px 8vw 64px;
@@ -111,7 +107,7 @@
     margin: 0;
     padding: 0;
     display: flex;
-    flex-direction: column;     /* filters stacked vertically */
+    flex-direction: column;
   }
 
   .filterOption {
@@ -129,7 +125,7 @@
   }
 
   .filterOption.on {
-    color: #1A1A1A;             /* selected filter darkens */
+    color: #1A1A1A;
   }
 
   .filterCheck {
@@ -146,6 +142,6 @@
     display: flex;
     justify-content: space-between;
   }
-  
+
 
 }

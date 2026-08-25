@@ -3,11 +3,10 @@
 }
 
 .home {
-  height: 100vh;        /* exactly one screen */
+  height: 100vh;
   width: 100%;
-  overflow: hidden;     /* the PAGE never scrolls; the list scrolls instead */
+  overflow: hidden;
   font-family: 'Jost', sans-serif;
-  /* margin-bottom: 100px; */
 }
 
 .mainContainer {
@@ -19,17 +18,15 @@
 .leftSide {
   height: 100vh;
   width: 100%;
-  overflow-y: auto;             /* the list scrolls inside here, not the page */
-  scrollbar-width: none;        /* Firefox */
+  overflow-y: auto;
+  scrollbar-width: none;
   -ms-overflow-style: none;
 }
 
-.leftSide::-webkit-scrollbar {     /* Chrome, Safari, new Edge */
+.leftSide::-webkit-scrollbar {
   display: none;
 }
 
-/* overlay layer: sits over the full-screen scrolling list, click-through except
-   for the real controls (buttons), which re-enable pointer events below. */
 .rightSide {
   position: fixed;
   inset: 0;
@@ -41,37 +38,31 @@
   pointer-events: auto;
 }
 
-/* the three.js canvas fills .rightSide, OUT of flow so the buttons/titleCards
-   sit on top of it instead of being pushed off-screen below it */
 .cube-canvas {
   position: absolute;
   inset: 0;
   width: 100%;
   height: 100%;
-  z-index: 6;   /* above .topfive (z-index 5) */
+  z-index: 6;
 }
 
-/* hover graphics — two overlapping images where the cube used to be.
-   fixed (not absolute) so it spans the whole viewport instead of being
-   trapped inside the collapsed, absolutely-positioned .rightSide. */
 .sliders {
   position: fixed;
   inset: 0;
   z-index: 6;
-  pointer-events: none;   /* don't block hover/scroll on the list */
+  pointer-events: none;
 }
 
 .sliders .slide {
-  position: absolute;        /* top/left come from inline styles (randomized in JS) */
+  position: absolute;
   width: 32%;
   max-width: 360px;
   aspect-ratio: 4 / 5;
   object-fit: cover;
   opacity: 0;
-  animation: fadeIn 0.45s ease forwards;   /* just appear — fade, no sliding */
+  animation: fadeIn 0.45s ease forwards;
 }
 
-/* tiny stagger so they don't pop at the exact same instant */
 .sliders .slide:nth-of-type(2) {
   animation-delay: 0.12s;
 }
@@ -80,7 +71,6 @@
   to { opacity: 1; }
 }
 
-/* A.svg brand mark, fixed in the corner above the canvas */
 .logo {
   position: fixed;
   top: 20px;
@@ -93,10 +83,8 @@
 .projects {
   list-style: none;
   padding: 64px 0 64px 8vw;
-  /* NOT absolute: must stay in .leftSide's flow so the list can scroll */
 }
 
-/* wrapper stays in flow so rows stack; no longer a full-width hit strip */
 .projectListContainer {
   position: relative;
 }
@@ -107,9 +95,9 @@
   line-height: 1;
   margin-top: 11px;
   white-space: nowrap;
-  width: fit-content;                /* hover target = the text itself */
+  width: fit-content;
   cursor: pointer;
-  color: #6b6b6b;                    /* legible resting state */
+  color: #6b6b6b;
   transition: color 0.2s ease;
 }
 
@@ -117,7 +105,6 @@
   color: #1A1A1A;
 }
 
-/* base (mobile-safe); desktop layout lives in the (width > 768px) block */
 .buttons {
   position: relative;
   display: flex;
@@ -131,7 +118,7 @@
   left: 50%;
   transform: translateX(-50%);
   display: flex;
-  align-items: center;       /* chips sit in line with the filter/archive buttons */
+  align-items: center;
   gap: 16px;
   pointer-events: auto;
 }
@@ -151,29 +138,26 @@
   cursor: pointer;
 }
 
-/* filter dropdown — the wrapper is the hover zone so moving from the button
-   down onto the options keeps it open (options sit flush under the button). */
 .filterWrap {
   position: relative;
-  /* padding-bottom: 5px; */
 }
 
 .optionfilters {
   position: absolute;
-  top: 100%;            /* box top touches the button bottom... */
+  top: 100%;
   left: 50%;
   transform: translateX(-50%);
-  display: none;        /* hidden until the wrapper is hovered */
+  display: none;
   flex-direction: column;
   align-items: center;
   gap: 6px;
-  padding-top: 10px;    /* ...this padding bridges the gap so hover never drops */
+  padding-top: 10px;
   margin: 0;
   list-style: none;
 }
 
 .filterWrap:hover .optionfilters {
-  display: flex;        /* reveal on hover */
+  display: flex;
   flex-direction: row;
 }
 
@@ -191,13 +175,11 @@
   color: #1A1A1A;
 }
 
-/* selected filter chips — sit between filter and archive; wrap to new rows
-   (beneath) once they hit the max width. */
 .selectedFilters {
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
-  max-width: 320px;        /* past this, chips wrap downward */
+  max-width: 320px;
   align-content: flex-start;
 }
 
@@ -215,7 +197,6 @@
   white-space: nowrap;
 }
 
-/* small x in the top-RIGHT corner, revealed on hover, click to remove */
 .chipX {
   all: unset;
   position: absolute;
@@ -247,7 +228,6 @@
 }
 
 
-/* title: bottom-right, mixed weight, responsive */
 .titleCards {
   position: absolute;
   bottom: 28px;
@@ -261,12 +241,12 @@
 .titleCards h2 {
   margin: 0;
   font-family: 'Jost', sans-serif;
-  font-size: 30px;        /* mobile-safe base; desktop overrides with clamp */
+  font-size: 30px;
   line-height: 1;
 }
 
 .titleCards h1 {
-  color: #777777;
+  color: #6b6b6b;
   font-weight: bold;
 }
 
@@ -274,7 +254,6 @@
   color: #111;
 }
 
-/* hover preview: anchored right-center, disciplined 2-up grid */
 .previewContainer {
   position: absolute;
   top: 50%;
@@ -290,7 +269,7 @@
   overflow: hidden;
   pointer-events: none;
   z-index: 6;
-  animation: previewIn 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;  /* slide in on mount */
+  animation: previewIn 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
 .previewImg {
@@ -304,7 +283,6 @@
   to   { opacity: 1; transform: translate(0, -50%) scale(1); }
 }
 
-/* "the cube" toggle next to the title */
 .cubeToggle {
   all: unset;
   font-family: 'Jost', sans-serif;
@@ -314,24 +292,17 @@
   color: #6b6b6b;
   cursor: pointer;
   font-style: italic;
-  /* border: 1px solid #1A1A1A; */
   padding: 2px 8px;
   transition: color 0.2s ease, background 0.2s ease;
   display:none;
 }
 
-/* .cubeToggle:hover {
-  color: #fff;
-  background: #1A1A1A;
-} */
 
   @media (width > 768px) {
     .topfive { display: none; }
     .mobilebuttons { display: none;}
     .cube-canvas {display: none}
 
-    /* cube mode: drop the interactive cube exactly where the preview lives.
-       higher specificity than `.cube-canvas { display:none }` above, so it wins. */
     .cubeMode .cube-canvas {
       display: block;
       position: absolute;
@@ -344,7 +315,6 @@
       z-index: 6;
     }
 
-    /* top nav: filter/archive centered, Info pinned right */
     .buttons {
       position: absolute;
       top: 28px;
@@ -359,7 +329,6 @@
       pointer-events: auto;
     }
 
-    /* title: bottom-right, mixed weight, responsive */
     .titleCards h1,
     .titleCards h2 {
       font-size: clamp(22px, 3vw, 42px);
@@ -367,9 +336,8 @@
     .titleCards h1 { font-weight: 400; }
     .titleCards h2 { color: #1A1A1A; font-weight: 700; }
   }
-  
+
   @media (width <= 768px) {
-    /* lock the app to exactly one screen so nothing scrolls past it */
     .sliders,
     .previewContainer {
       display: none;
@@ -380,7 +348,7 @@
     }
 
     .rightSide {
-      width: 100vw;       /* cube fills the phone width; stays in flow */
+      width: 100vw;
       min-height: 100vh;
       height: 100vh;
       position: relative;
@@ -388,17 +356,15 @@
     .cubeToggle {
       display: none;
     }
-    /* pin the title centered at the bottom of the screen, OUT of flow so it
-       adds no scroll height. reset the desktop width/margin/size. */
     .titleCards {
       position: fixed;
       bottom: 16px;
       left: 0;
       right: 0;
-      width: auto;        /* undo desktop width: 800px */
-      margin: 0;          /* undo desktop margin-left: 12vw */
+      width: auto;
+      margin: 0;
       flex-direction: row;
-      flex-wrap: wrap;    /* let the two lines wrap on a narrow phone */
+      flex-wrap: wrap;
       justify-content: center;
       align-items: center;
       gap: 6px;
@@ -406,14 +372,11 @@
     }
     .titleCards h1,
     .titleCards h2 {
-      font-size: 28px;    /* bigger on mobile */
+      font-size: 28px;
     }
-    /* nudge the cube left on mobile only (second value moves it up/down —
-       lower = higher up the screen) */
     .cube-canvas {
       transform: translate(-8vw, 5vh);
     }
-    /* TOP 5: two per row, comma-separated, 5th centered beneath — no pixel nudging */
     .topfive {
       display: flex;
       flex-wrap: wrap;
@@ -423,42 +386,38 @@
       list-style: none;
       margin: 0;
       padding: 24px 16px;
-      position: relative;   /* sits above the cube canvas */
+      position: relative;
       z-index: 5;
       color: #214c79;
-      pointer-events: auto; /* re-enable: .rightSide turned events off */
+      pointer-events: auto;
     }
     .topfive li {
-      flex: 0 0 45%;        /* ~two per row, % not px so it scales */
+      flex: 0 0 45%;
       text-align: center;
       list-style: none;
       font-family: 'Jost', sans-serif;
       font-weight: 300;
       font-size: 13px;
       cursor: pointer;
-      color: #6b6b6b;                    /* legible resting state */
+      color: #6b6b6b;
 
 
       transition: color 0.2s ease;
-      /* without this, a quick second tap is swallowed by the browser's
-         double-tap-to-zoom gesture, so the 2nd tap never navigates */
       touch-action: manipulation;
     }
     .topfive li:last-child {
-      flex-basis: 100%;     /* 5th drops to its own row, centered by justify-content */
+      flex-basis: 100%;
     }
     .topfive li:not(:last-child)::after {
-      content: ',';         /* comma separators */
+      content: ',';
     }
     .topfive li.hovered {
-      color: #1A1A1A;       /* tapped/selected -> dark */
+      color: #1A1A1A;
     }
 
     .projects { display: none; }
     .leftSide { display: none; }
 
-    /* keep .buttons visible (it WRAPS the mobile buttons) but hide the
-       desktop sub-groups, and show the stacked mobile buttons instead */
     .buttons {
       display: flex;
       justify-content: center;
@@ -469,23 +428,19 @@
     .twomain { display: none; }
     .info { display: none; }
     .mobilebuttons .info {
-      color: #777777;
-      opacity: 70%;
-      
+      color: #6b6b6b;
     }
     .mobilebuttons .archive {
-      color: #777777;
-      opacity: 70%;
-      
+      color: #6b6b6b;
     }
 
     .mobilebuttons .info:hover {
-      color: #1A1A1A;   /* teal */
+      color: #1A1A1A;
     }
 
 
     .mobilebuttons .archive:hover {
-      color: #1A1A1A;   /* teal */
+      color: #1A1A1A;
     }
 
     .mobilebuttons {
@@ -496,7 +451,6 @@
       position: relative;
       z-index: 5;
     }
-    /* button-reset goes on the BUTTONS, not the flex container */
     .mobilebuttons button {
       all: unset;
       font-family: 'Jost', sans-serif;
@@ -506,4 +460,4 @@
       padding-top: 15px;
     }
   }
-  
+

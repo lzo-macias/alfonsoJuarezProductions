@@ -1,7 +1,6 @@
-import React, { useState } from 'react'
+import { useState } from 'react'
 import '../../styling/ArchiveMobile.css'
 
-// the seven selectable filters
 const FILTERS = [1, 2, 3, 4, 5, 6, 7]
 
 const projects = [
@@ -71,8 +70,6 @@ const projects = [
 ]
 
 function ArchiveMobile() {
-  // whether the filter page is open, and which filters are selected (saved here so
-  // they persist while this component is mounted, even after closing the page)
   const [filterOpen, setFilterOpen] = useState(false)
   const [selected, setSelected] = useState([])
 

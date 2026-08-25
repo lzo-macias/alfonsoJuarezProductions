@@ -1,8 +1,8 @@
 .comingSoon {
   position: fixed;
   inset: 0;
-  z-index: 100;                /* above everything in the hero */
-  background: #F5F6F6;         /* same background as the site */
+  z-index: 100;
+  background: #F5F6F6;
   font-family: 'Jost', sans-serif;
   display: flex;
   align-items: center;

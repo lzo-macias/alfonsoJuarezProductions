@@ -1,12 +1,13 @@
-import React, { useRef, useState, useEffect } from 'react'
+import { useRef, useState, useEffect, lazy, Suspense } from 'react'
 import "../../styling/app.css"
-import Cube from '../components/Cube'
-import Sliders from '../components/Sliders'
 import ComingSoon from '../components/ComingSoon'
-import { div } from 'three/tsl'
 
-// fashion / runway stock photos (Unsplash — CORS-enabled so WebGL can texture them).
-// swap these for your own by dropping files in /public/img and listing them here.
+const Cube = lazy(() => import('../components/Cube'))
+
+const MOBILE_QUERY = '(max-width: 768px)'
+const isMobileNow = () =>
+  typeof window !== 'undefined' && window.matchMedia(MOBILE_QUERY).matches
+
 const fashionImages = [
   '1490481651871-ab68de25d43d',
   '1483985988355-763728e1935b',
@@ -26,7 +27,7 @@ const fashionImages = [
   '1483118714900-540cf339fd46',
   '1475180098004-ca77a66827be',
   '1524504388940-b1c1722653e1',
-].map((id) => `https://images.unsplash.com/photo-${id}?w=500&h=500&fit=crop&auto=format&q=70`)
+].map((id) => `https://images.unsplash.com/photo-${id}?w=320&h=320&fit=crop&auto=format&q=60`)
 
 
 const projects = [
@@ -95,7 +96,6 @@ const projects = [
   'Teva Camino de Santiago',
 ]
 
-// options shown in the filter dropdown — edit these labels to your real filters
 const filterOptions = ['1', '2', '3', '4', '5', '6', '7']
 
 const topfive = [
@@ -106,9 +106,6 @@ const topfive = [
   'Eckhaus Latta SS26',
 ]
 
-// Pick the images that belong to a hovered project. For now this is a stable
-// slice of the shared list so each project shows a different set. Replace this
-// with a real { projectIndex: [urls] } mapping once you have per-project photos.
 const imagesFor = (index) => {
   if (index === -1) {
     return []
@@ -123,53 +120,36 @@ const imagesFor = (index) => {
 function Home() {
   const leftRef = useRef(null)
   const rightRef = useRef(null)
-  // shared scroll signal the cube reads every frame (velocity = how fast you're scrolling)
   const scroll = useRef({ velocity: 0, lastTop: 0 })
-  // pick a random top-five item to pre-select — fresh on every page load
   const [preselected] = useState(() => Math.floor(Math.random() * topfive.length))
-  // which project is hovered -> drives the teal text + the cube's panel selection.
-  // on mobile we boot with the random pre-selected item so the cube loads fully
-  // expanded; desktop boots idle (-1) so its load is unchanged.
-  const [hovered, setHovered] = useState(() =>
-    typeof window !== 'undefined' && window.matchMedia('(max-width: 768px)').matches ? preselected : -1
-  )
-  // filters the user has picked from the dropdown -> shown as chips by the buttons
+  const [isMobile, setIsMobile] = useState(isMobileNow)
+  const [hovered, setHovered] = useState(() => (isMobileNow() ? preselected : -1))
   const [filters, setFilters] = useState([])
   const addFilter = (f) => setFilters((prev) => (prev.includes(f) ? prev : [...prev, f]))
   const removeFilter = (f) => setFilters((prev) => prev.filter((x) => x !== f))
-  // toggles the interactive cube into the preview slot (instead of the image preview)
   const [showCube, setShowCube] = useState(false)
-  // hides the sticky image preview after you scroll past the very top/bottom of
-  // the list. it's a separate gate (not just hovered) because the browser fires
-  // mouseenter events while the list scrolls under a stationary cursor, which
-  // would immediately restore `hovered` and undo a plain reset. this flag stays
-  // set until you make a REAL mouse move, matching the fresh page-load state.
   const [previewHidden, setPreviewHidden] = useState(false)
-  // top-five (mobile) two-tap: first tap selects/expands an item, second tap on the
-  // SAME item navigates to the coming-soon page. activeTop = which one is "armed".
-  // it boots on the random pre-selected item: it loads dark (#1A1A1A) and takes a
-  // single tap to navigate.
   const [activeTop, setActiveTop] = useState(preselected)
   const [comingSoon, setComingSoon] = useState(false)
 
   const handleTopClick = (index) => {
     if (activeTop === index) {
-      setComingSoon(true)          // second tap -> go to the page
+      setComingSoon(true)
     } else {
-      setActiveTop(index)          // first tap -> arm + expand
-      setHovered(index)            // the cube reacts to the selection
+      setActiveTop(index)
+      setHovered(index)
     }
   }
-  // scrolling ANYWHERE on the page scrolls the project list. listen on window
-  // (native, non-passive) so preventDefault() stops the page from scrolling and
-  // we redirect the wheel delta into the list instead.
+  useEffect(() => {
+    const mq = window.matchMedia(MOBILE_QUERY)
+    const onChange = (e) => setIsMobile(e.matches)
+    mq.addEventListener('change', onChange)
+    return () => mq.removeEventListener('change', onChange)
+  }, [])
+
   useEffect(() => {
     const onWheel = (e) => {
       if (!leftRef.current) return
-      // only hijack the wheel when the desktop list is actually on screen.
-      // on mobile .leftSide is display:none (offsetParent === null), so let the
-      // page scroll natively — otherwise preventDefault traps the page and you
-      // can never scroll down to the archive below the hero.
       if (leftRef.current.offsetParent === null) return
       e.preventDefault()
       leftRef.current.scrollTop += e.deltaY
@@ -178,10 +158,6 @@ function Home() {
     return () => window.removeEventListener('wheel', onWheel)
   }, [])
 
-  // hide the sticky image preview when the cursor moves OFF THE ENDS of the list
-  // — above the very first project or below the very last one. this is purely a
-  // pointer-position check (scrolling is irrelevant): we compare the mouse Y
-  // against the current top of the first item and bottom of the last item.
   useEffect(() => {
     const onMove = (e) => {
       const list = leftRef.current
@@ -196,7 +172,6 @@ function Home() {
     return () => window.removeEventListener('mousemove', onMove)
   }, [])
 
-  // measure how far the list moved this tick -> feed the cube's pulse
   const handleLeftScroll = () => {
     const top = leftRef.current.scrollTop
     scroll.current.velocity += Math.abs(top - scroll.current.lastTop)
@@ -209,18 +184,18 @@ function Home() {
             <div className='leftSide' ref={leftRef} onScroll={handleLeftScroll}>
                 <ul className='projects'>
                     {projects.map((project, index) => (
-                    <div key={index} className='projectListContainer'>
                       <li
-                        className={hovered === index ? 'hovered' : ''}
+                        key={index}
+                        className={
+                          hovered === index
+                            ? 'projectListContainer hovered'
+                            : 'projectListContainer'
+                        }
                         onMouseEnter={() => setHovered(index)}
-                        // cube mode: reset on leave so the cube returns to normal when
-                        // not directly over an item. preview mode: stay sticky (no reset).
                         onMouseLeave={showCube ? () => setHovered(-1) : undefined}
                       >
-                      {project}
-                    </li>
-                    </div>
-
+                        {project}
+                      </li>
                     ))}
                 </ul>
             </div>
@@ -262,29 +237,34 @@ function Home() {
                       <button className='info'>Info</button>
                   </div>
                 </div>
-                <div className = "topfive">
+                <ul className='topfive'>
                     {topfive.map((top, index) => (
                     <li
                       key={index}
                       className={hovered === index || activeTop === index ? 'hovered' : ''}
                       onMouseEnter={() => setHovered(index)}
-                      // no onMouseLeave reset: the cube stays expanded on the last
-                      // selected item; tapping another item just switches the selection
                       onClick={() => handleTopClick(index)}
                     >
                       {top}
                     </li>
                     ))}
-                </div>
-                {/* Both are always rendered; CSS picks which is visible per breakpoint.
-                    Desktop hides .cube-canvas (sliders show on hover); mobile hides
-                    .sliders (the cube stays and reacts to `hovered`). */}
-                <Cube images={fashionImages} scroll={scroll} hovered={hovered} />
-                {/* charcoal preview slides in on hover — hidden while the cube is shown */}
+                </ul>
+                {(isMobile || showCube) && (
+                  <Suspense fallback={null}>
+                    <Cube images={fashionImages} scroll={scroll} hovered={hovered} />
+                  </Suspense>
+                )}
                 {!showCube && hovered >= 0 && !previewHidden && (
                   <div className='previewContainer' key={hovered}>
                     {imagesFor(hovered).map((src, i) => (
-                      <img key={i} src={src} alt='' className='previewImg' />
+                      <img
+                        key={i}
+                        src={src}
+                        alt=''
+                        className='previewImg'
+                        loading='lazy'
+                        decoding='async'
+                      />
                     ))}
                   </div>
                 )}
@@ -294,7 +274,7 @@ function Home() {
                     <button
                       className='cubeToggle'
                       onClick={() => {
-                        if (!showCube) setHovered(-1)   // entering cube mode -> start idle
+                        if (!showCube) setHovered(-1)
                         setShowCube((v) => !v)
                       }}
                     >
